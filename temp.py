@@ -51,5 +51,5 @@ def write_csv_file(data, file_path):
             writer.writerow(csv_model.__dict__)
  
 if __name__ == "__main__":
-    data = generate_data(100000)
-    write_csv_file(data, "output.csv")
+    data = generate_data(10000)
+    write_csv_file(data, "output1.csv")

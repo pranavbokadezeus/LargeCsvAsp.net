@@ -127,6 +127,9 @@ using System.Text;
 using MySqlConnector;
 using System.Data;
 using System.Diagnostics;
+using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
+using Microsoft.IdentityModel.Tokens;
 namespace LargeDatasetProject.Controllers
 {
     [Route("api/LargeCsv")]
@@ -142,7 +145,8 @@ namespace LargeDatasetProject.Controllers
             _logger = logger;
         }
 
-    
+        
+      
 
         [HttpPost]
         [Route("upload-csv/")]
@@ -196,6 +200,7 @@ namespace LargeDatasetProject.Controllers
 
                 string ConnectionString = "Server=localhost;Database=largedatasetdb;User=root;Password=root;";
                 StringBuilder sCommand = new StringBuilder("REPLACE INTO employees (Id,Email,Name,Country,State,City,Telephone,AddressLine1,AddressLine2,DOB,FY2019_20,FY2020_21,FY2021_22,FY2022_23,FY2023_24) VALUES ");           
+                String sCommand2 = sCommand.ToString();
                 using (MySqlConnection mConnection = new MySqlConnection(ConnectionString))
                 {
                     Console.WriteLine("connection made successfully");
@@ -203,37 +208,43 @@ namespace LargeDatasetProject.Controllers
                     for (int i = 0; i < 100000; i++)
                     {
                         Rows.Add(string.Format("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}')", 
-                        models[i].ID,
-                        MySqlHelper.EscapeString(models[i].Email), 
-                        MySqlHelper.EscapeString(models[i].Name), 
-                        MySqlHelper.EscapeString(models[i].Country), 
-                        MySqlHelper.EscapeString(models[i].State), 
-                        MySqlHelper.EscapeString(models[i].City), 
-                        MySqlHelper.EscapeString(models[i].Telephone), 
-                        MySqlHelper.EscapeString(models[i].AddressLine1), 
-                        MySqlHelper.EscapeString(models[i].AddressLine2), 
-                        models[i].DOB.ToString("yyyy-MM-dd"),
-                        models[i].FY2019_20,
-                        models[i].FY2020_21,
-                        models[i].FY2021_22,
-                        models[i].FY2022_23,
-                        models[i].FY2023_24
-                        ));
+                                models[i].ID,
+                                MySqlHelper.EscapeString(models[i].Email), 
+                                MySqlHelper.EscapeString(models[i].Name), 
+                                MySqlHelper.EscapeString(models[i].Country), 
+                                MySqlHelper.EscapeString(models[i].State), 
+                                MySqlHelper.EscapeString(models[i].City), 
+                                MySqlHelper.EscapeString(models[i].Telephone), 
+                                MySqlHelper.EscapeString(models[i].AddressLine1), 
+                                MySqlHelper.EscapeString(models[i].AddressLine2), 
+                                models[i].DOB.ToString("yyyy-MM-dd"),
+                                models[i].FY2019_20,
+                                models[i].FY2020_21,
+                                models[i].FY2021_22,
+                                models[i].FY2022_23,
+                                models[i].FY2023_24
+                            ));
                     }
                     sCommand.Append(string.Join(",", Rows));
                     sCommand.Append(";");
                     mConnection.Open();
+                    using var transactions = await mConnection.BeginTransactionAsync();
                     using (MySqlCommand myCmd = new MySqlCommand(sCommand.ToString(), mConnection))
                     {
+                        myCmd.Transaction = transactions;
                         myCmd.CommandType = CommandType.Text;
                         try {
                             await myCmd.ExecuteNonQueryAsync();
+                            sCommand.Clear();
+                            sCommand.Append(sCommand2);
                         }
                         catch(Exception e) {
                             Console.WriteLine(e);
+                            await transactions.RollbackAsync();
                         }
                         // myCmd.ExecuteNonQuery();
                     }
+                    await transactions.CommitAsync();
                 }
                 Console.WriteLine("data uploaded successfully");
                 Console.WriteLine(st.Elapsed);
@@ -257,34 +268,34 @@ namespace LargeDatasetProject.Controllers
         // Other controller actions for CRUD operations on employees
 
         [HttpGet]
-    public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
-    {
-        var existUser = await _applicationDbContext.Employees.Take(15).ToListAsync();
-
-    if(existUser.Count() == 0) {
-
-        return NotFound();
-
-    }
-
-    return Ok(existUser);
-        
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Employee>> GetEmployee(int id)
-    {
-        if(_applicationDbContext.Employees == null)
+        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
+            var existUser = await _applicationDbContext.Employees.Take(15).ToListAsync();
+
+        if(existUser.Count() == 0) {
+
             return NotFound();
+
         }
-        var employee = await _applicationDbContext.Employees.FindAsync(id);
-        if(employee == null) 
+
+        return Ok(existUser);
+            
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Employee>> GetEmployee(int id)
         {
-            return NotFound();
+            if(_applicationDbContext.Employees == null)
+            {
+                return NotFound();
+            }
+            var employee = await _applicationDbContext.Employees.FindAsync(id);
+            if(employee == null) 
+            {
+                return NotFound();
+            }
+            return employee;
         }
-        return employee;
-    }
 
     [HttpPost]
     public async Task<ActionResult<Employee>> PostEmployee(Employee employee)

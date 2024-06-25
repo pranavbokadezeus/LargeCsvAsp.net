@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProject\\Backend\\LargeDatasetProject.csproj": {}
+    "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\Backend\\LargeDatasetProject.csproj": {}
   },
   "projects": {
-    "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProject\\Backend\\LargeDatasetProject.csproj": {
+    "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\Backend\\LargeDatasetProject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProject\\Backend\\LargeDatasetProject.csproj",
+        "projectUniqueName": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\Backend\\LargeDatasetProject.csproj",
         "projectName": "LargeDatasetProject",
-        "projectPath": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProject\\Backend\\LargeDatasetProject.csproj",
+        "projectPath": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\Backend\\LargeDatasetProject.csproj",
         "packagesPath": "C:\\Users\\pranav.bokade\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProject\\Backend\\obj\\",
+        "outputPath": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\Backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\pranav.bokade\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -110,6 +110,10 @@
             "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
               "version": "[8.0.2, )"
+            },
+            "RabbitMQ.Client": {
+              "target": "Package",
+              "version": "[6.8.1, )"
             },
             "Serilog.Extensions.Logging": {
               "target": "Package",
