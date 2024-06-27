@@ -11479,11 +11479,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\Backend\\LargeDatasetProject.csproj",
+      "projectUniqueName": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\backend\\LargeDatasetProject.csproj",
       "projectName": "LargeDatasetProject",
-      "projectPath": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\Backend\\LargeDatasetProject.csproj",
+      "projectPath": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\backend\\LargeDatasetProject.csproj",
       "packagesPath": "C:\\Users\\pranav.bokade\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\Backend\\obj\\",
+      "outputPath": "C:\\Users\\pranav.bokade\\Desktop\\Pranav\\asp .net\\Projects\\LargeDatasetProjectGit\\LargeCsvAsp.net\\backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\pranav.bokade\\AppData\\Roaming\\NuGet\\NuGet.Config"

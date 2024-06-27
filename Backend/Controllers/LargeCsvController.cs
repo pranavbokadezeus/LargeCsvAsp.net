@@ -130,6 +130,7 @@ using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 namespace LargeDatasetProject.Controllers
 {
     [Route("api/LargeCsv")]
@@ -145,125 +146,51 @@ namespace LargeDatasetProject.Controllers
             _logger = logger;
         }
 
+        private void SendMessageToQueue(string filePath)
+        {
+            var factory = new ConnectionFactory { HostName = _hostname };
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
+            channel.QueueDeclare(queue: _queueName,
+                                durable: false,
+                                exclusive: false,
+                                autoDelete: false,
+                                arguments: null);
+
+            var message = Encoding.UTF8.GetBytes(filePath);
+            channel.BasicPublish(exchange: string.Empty,
+                                routingKey: _queueName,
+                                basicProperties: null,
+                                body: message);
+            Console.WriteLine($" [x] Sent {filePath}");
+        }
         
       
+
+        private readonly string _hostname = "localhost";
+        private readonly string _queueName = "file_uploads";
 
         [HttpPost]
         [Route("upload-csv/")]
         public async Task<ActionResult> UploadCsvAsync(IFormFile file)
         {
-            Console.WriteLine("I'm post file");
             if (file == null || file.Length == 0)
             {
                 return BadRequest("No file uploaded.");
             }
- 
-            var filePath = Path.GetTempFileName();
- 
-            try
-            {
-                var stream = new MemoryStream();
-                await file.CopyToAsync(stream);
-                stream.Position = 0; // Reset the stream position to the beginning
- 
- 
-                var models = new List<Employee>();
- 
-                using (var reader = new StreamReader(stream))
-                {
-                    string line;
-                    bool isHeader = true;
- 
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (isHeader)
-                        {
-                            isHeader = false;
-                            continue;
-                        }
-                        try
-                        {
-                            models.Add(line.ToCsvData());
-                        }
-                        catch (Exception ex)
-                        {
-                            // Log the error and continue processing other lines
-                            Console.WriteLine($"Error parsing line: {line}. Exception: {ex.Message}");
-                        }
-                    }
-                }
-                Console.WriteLine("file parsed successfully");
-                // await _applicationDbContext.BulkInsertAsync(models);
-                // await _applicationDbContext.SaveChangesAsync();
-                Stopwatch st = new Stopwatch();
-                st.Start();
 
-                string ConnectionString = "Server=localhost;Database=largedatasetdb;User=root;Password=root;";
-                StringBuilder sCommand = new StringBuilder("REPLACE INTO employees (Id,Email,Name,Country,State,City,Telephone,AddressLine1,AddressLine2,DOB,FY2019_20,FY2020_21,FY2021_22,FY2022_23,FY2023_24) VALUES ");           
-                String sCommand2 = sCommand.ToString();
-                using (MySqlConnection mConnection = new MySqlConnection(ConnectionString))
-                {
-                    Console.WriteLine("connection made successfully");
-                    List<string> Rows = new List<string>();
-                    for (int i = 0; i < 100000; i++)
-                    {
-                        Rows.Add(string.Format("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}')", 
-                                models[i].ID,
-                                MySqlHelper.EscapeString(models[i].Email), 
-                                MySqlHelper.EscapeString(models[i].Name), 
-                                MySqlHelper.EscapeString(models[i].Country), 
-                                MySqlHelper.EscapeString(models[i].State), 
-                                MySqlHelper.EscapeString(models[i].City), 
-                                MySqlHelper.EscapeString(models[i].Telephone), 
-                                MySqlHelper.EscapeString(models[i].AddressLine1), 
-                                MySqlHelper.EscapeString(models[i].AddressLine2), 
-                                models[i].DOB.ToString("yyyy-MM-dd"),
-                                models[i].FY2019_20,
-                                models[i].FY2020_21,
-                                models[i].FY2021_22,
-                                models[i].FY2022_23,
-                                models[i].FY2023_24
-                            ));
-                    }
-                    sCommand.Append(string.Join(",", Rows));
-                    sCommand.Append(";");
-                    mConnection.Open();
-                    using var transactions = await mConnection.BeginTransactionAsync();
-                    using (MySqlCommand myCmd = new MySqlCommand(sCommand.ToString(), mConnection))
-                    {
-                        myCmd.Transaction = transactions;
-                        myCmd.CommandType = CommandType.Text;
-                        try {
-                            await myCmd.ExecuteNonQueryAsync();
-                            sCommand.Clear();
-                            sCommand.Append(sCommand2);
-                        }
-                        catch(Exception e) {
-                            Console.WriteLine(e);
-                            await transactions.RollbackAsync();
-                        }
-                        // myCmd.ExecuteNonQuery();
-                    }
-                    await transactions.CommitAsync();
-                }
-                Console.WriteLine("data uploaded successfully");
-                Console.WriteLine(st.Elapsed);
- 
-                return Ok(new { file.ContentType, file.Length, file.FileName });
-            }
-            catch (Exception ex)
+            var filePath = Path.GetTempFileName();
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                Console.WriteLine(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+                await file.CopyToAsync(stream);
             }
-            finally
-            {
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-            }
+
+            SendMessageToQueue(filePath);
+
+            return Ok(new { file.ContentType, file.Length, file.FileName });
         }
+
+        
 
         // Other controller actions for CRUD operations on employees
 

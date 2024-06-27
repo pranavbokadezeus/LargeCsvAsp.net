@@ -34,6 +34,33 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+// ----------------------------------------------
+
+if (args.Length > 0 && args[0].ToLower() == "worker")
+        {
+            StartWorker();
+        }
+        else
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+
+static void StartWorker()
+    {
+        var worker = new RabbitMQWorker("localhost", "file_uploads", "Server=localhost;Database=largedatasetdb;User=root;Password=root;");
+        worker.StartWorking();
+    }
+
+static IHostBuilder CreateHostBuilder(string[] args)
+{
+    return Host.CreateDefaultBuilder(args)
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        });
+}
+
 
 app.UseCors(builder => builder
 .AllowAnyOrigin()
