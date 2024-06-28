@@ -1,0 +1,4 @@
+mongo atlas cluster
+username: pranavbokade279
+Password: 8wpdgPRZhZsJS1ej
+connection string: mongodb+srv://pranavbokade279:8wpdgPRZhZsJS1ej@cluster0.xyuvl0s.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0

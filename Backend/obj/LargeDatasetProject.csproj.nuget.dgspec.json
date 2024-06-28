@@ -91,6 +91,14 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.27.0, )"
+            },
+            "MongoDB.Driver.Core": {
+              "target": "Package",
+              "version": "[2.27.0, )"
+            },
             "MySql.Data": {
               "target": "Package",
               "version": "[8.4.0, )"
